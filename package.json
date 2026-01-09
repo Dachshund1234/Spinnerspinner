@@ -1,0 +1,21 @@
+{
+  "name": "wrestling-promotion-manager",
+  "version": "0.1.0",
+  "description": "A professional wrestling promotion management game similar to Football Manager",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "wrestling",
+    "game",
+    "management",
+    "simulation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}
