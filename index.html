@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pro Wrestling Simulator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: #f5f5f5;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      background: #f5f5f5;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.3s;
+    }
+
+    .nav-tab:hover {
+      background: #e0e0e0;
+    }
+
+    .nav-tab.active {
+      background: white;
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 30px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .wrestler-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .wrestler-card {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px;
+      background: #fafafa;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .wrestler-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      border-color: #667eea;
+    }
+
+    .wrestler-card h3 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 1.3em;
+    }
+
+    .wrestler-card .info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .wrestler-card .info-item {
+      background: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .wrestler-card .rating {
+      margin-top: 15px;
+      padding: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .wrestler-detail {
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 30px;
+      margin-top: 20px;
+    }
+
+    .detail-section {
+      margin-bottom: 30px;
+    }
+
+    .detail-section h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .attribute-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .attribute-item {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .attribute-item label {
+      display: block;
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .attribute-item .value {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border: 2px solid #e0e0e0;
+    }
+
+    .stat-card .number {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .stat-card .label {
+      color: #666;
+      font-size: 1em;
+    }
+
+    #wheelCanvas {
+      border: 2px solid #333;
+      border-radius: 50%;
+      margin: 20px auto;
+      display: block;
+    }
+
+    .actions {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .back-btn {
+      background: #666;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Pro Wrestling Simulator</h1>
+      <p>Manage your wrestling roster like a pro</p>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('roster')">Roster</button>
+      <button class="nav-tab" onclick="switchTab('details')">Wrestler Details</button>
+      <button class="nav-tab" onclick="switchTab('stats')">Statistics</button>
+      <button class="nav-tab" onclick="switchTab('spinner')">Spinner</button>
+    </div>
+
+    <div id="roster" class="tab-content active">
+      <input type="text" class="search-box" id="searchBox" placeholder="Search wrestlers..." onkeyup="searchWrestlers()">
+      <div class="actions">
+        <button class="btn btn-primary" onclick="loadSampleWrestlers()">Load Sample Data</button>
+        <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+        <button class="btn btn-secondary" onclick="clearAllData()">Clear All</button>
+      </div>
+      <div id="wrestlerGrid" class="wrestler-grid"></div>
+    </div>
+
+    <div id="details" class="tab-content">
+      <button class="back-btn" onclick="switchTab('roster')">← Back to Roster</button>
+      <div id="wrestlerDetail"></div>
+    </div>
+
+    <div id="stats" class="tab-content">
+      <h2 style="margin-bottom: 20px;">Roster Statistics</h2>
+      <div class="stats-overview" id="statsOverview"></div>
+      <div class="detail-section">
+        <h3>Top 10 Wrestlers by Overall Rating</h3>
+        <div id="topWrestlers"></div>
+      </div>
+    </div>
+
+    <div id="spinner" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 20px;">Random Wrestler Selector</h2>
+      <canvas id="wheelCanvas" width="600" height="600"></canvas>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="spinWheel()">Spin the Wheel!</button>
+        <h2 id="result"></h2>
+      </div>
+    </div>
+  </div>
+
+  <script src="wrestler-model.js"></script>
+  <script src="sample-data.js"></script>
+  <script>
+    // Initialize wrestler manager
+    const manager = new WrestlerManager();
+
+    // Switch between tabs
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+
+      // Refresh content based on tab
+      if (tabName === 'roster') {
+        displayWrestlers();
+      } else if (tabName === 'stats') {
+        displayStats();
+      } else if (tabName === 'spinner') {
+        initializeSpinner();
+      }
+    }
+
+    // Display all wrestlers in grid
+    function displayWrestlers(wrestlers = null) {
+      const grid = document.getElementById('wrestlerGrid');
+      const wrestlerList = wrestlers || manager.getAllWrestlers();
+
+      if (wrestlerList.length === 0) {
+        grid.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No wrestlers found. Click "Load Sample Data" to get started.</p>';
+        return;
+      }
+
+      grid.innerHTML = wrestlerList.map(w => `
+        <div class="wrestler-card" onclick="showWrestlerDetail('${w.id}')">
+          <h3>${w.name}</h3>
+          <div class="info">
+            <div class="info-item"><strong>Age:</strong> ${w.age}</div>
+            <div class="info-item"><strong>Style:</strong> ${w.workingStyle}</div>
+            <div class="info-item"><strong>Country:</strong> ${w.basedInCountry}</div>
+            <div class="info-item"><strong>Status:</strong> ${w.status}</div>
+          </div>
+          <div class="rating">Overall Rating: ${w.getOverallRating()}</div>
+        </div>
+      `).join('');
+    }
+
+    // Search wrestlers
+    function searchWrestlers() {
+      const query = document.getElementById('searchBox').value;
+      if (query.trim() === '') {
+        displayWrestlers();
+      } else {
+        const results = manager.searchWrestlers(query);
+        displayWrestlers(results);
+      }
+    }
+
+    // Show detailed wrestler view
+    function showWrestlerDetail(id) {
+      const wrestler = manager.getWrestlerById(id);
+      if (!wrestler) return;
+
+      switchTab('details');
+
+      const detailDiv = document.getElementById('wrestlerDetail');
+      detailDiv.innerHTML = `
+        <div class="wrestler-detail">
+          <h2 style="margin-bottom: 20px; color: #667eea;">${wrestler.name}</h2>
+
+          <div class="detail-section">
+            <h3>Basic Information</h3>
+            <div class="attribute-grid">
+              <div class="attribute-item">
+                <label>ID</label>
+                <div class="value">${wrestler.id}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Age</label>
+                <div class="value">${wrestler.age} years</div>
+              </div>
+              <div class="attribute-item">
+                <label>Sexuality</label>
+                <div class="value">${wrestler.sexuality}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Worker Type</label>
+                <div class="value">${wrestler.workerType}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Status</label>
+                <div class="value">${wrestler.status}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Working Style</label>
+                <div class="value">${wrestler.workingStyle}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Height</label>
+                <div class="value">${wrestler.height} cm</div>
+              </div>
+              <div class="attribute-item">
+                <label>Weight</label>
+                <div class="value">${wrestler.weight} kg</div>
+              </div>
+              <div class="attribute-item">
+                <label>Experience</label>
+                <div class="value">${wrestler.getYearsOfExperience()} years</div>
+              </div>
+              <div class="attribute-item">
+                <label>Location</label>
+                <div class="value">${wrestler.basedInCity}, ${wrestler.basedInCountry}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Collar</label>
+                <div class="value">${wrestler.collar}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Fatigue</label>
+                <div class="value">${wrestler.fatigue}%</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.fatigue}%; background: ${wrestler.fatigue > 70 ? '#e74c3c' : '#667eea'};"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Physical Condition</h3>
+            <div class="attribute-grid">
+              ${Object.entries(wrestler.physicalCondition).map(([part, value]) => `
+                <div class="attribute-item">
+                  <label>${part.charAt(0).toUpperCase() + part.slice(1)}</label>
+                  <div class="value">${value}/100</div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${value}%;"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Wrestling Attributes</h3>
+            <div class="attribute-grid">
+              <div class="attribute-item">
+                <label>Overall Rating</label>
+                <div class="value" style="color: #667eea; font-size: 1.5em;">${wrestler.getOverallRating()}/100</div>
+              </div>
+              <div class="attribute-item">
+                <label>Brawling</label>
+                <div class="value">${wrestler.brawling}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.brawling}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Technical Wrestling</label>
+                <div class="value">${wrestler.technicalWrestling}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.technicalWrestling}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Star Power</label>
+                <div class="value">${wrestler.starPower}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.starPower}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>High Flying</label>
+                <div class="value">${wrestler.highFlying}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.highFlying}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Hardcore</label>
+                <div class="value">${wrestler.hardcore}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.hardcore}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Safety</label>
+                <div class="value">${wrestler.safety}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.safety}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Dramatic Acting</label>
+                <div class="value">${wrestler.dramaticActing}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.dramaticActing}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Wrestling Psychology</label>
+                <div class="value">${wrestler.wrestlingPsychology}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.wrestlingPsychology}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Play By Play</label>
+                <div class="value">${wrestler.playByPlay}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.playByPlay}%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Popularity by Region</h3>
+            <div class="attribute-grid">
+              ${Object.entries(wrestler.popularity).map(([country, regions]) =>
+                Object.entries(regions).map(([region, value]) => `
+                  <div class="attribute-item">
+                    <label>${country} - ${region}</label>
+                    <div class="value">${value}/100</div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: ${value}%;"></div>
+                    </div>
+                  </div>
+                `).join('')
+              ).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Display statistics
+    function displayStats() {
+      const wrestlers = manager.getAllWrestlers();
+      const statsDiv = document.getElementById('statsOverview');
+      const topDiv = document.getElementById('topWrestlers');
+
+      if (wrestlers.length === 0) {
+        statsDiv.innerHTML = '<p style="text-align: center; color: #666;">No data available</p>';
+        topDiv.innerHTML = '';
+        return;
+      }
+
+      // Calculate statistics
+      const avgRating = Math.round(wrestlers.reduce((sum, w) => sum + w.getOverallRating(), 0) / wrestlers.length);
+      const avgAge = Math.round(wrestlers.reduce((sum, w) => sum + w.age, 0) / wrestlers.length);
+      const activeWrestlers = wrestlers.filter(w => w.status === 'Active').length;
+      const avgCondition = Math.round(wrestlers.reduce((sum, w) => sum + w.getPhysicalConditionRating(), 0) / wrestlers.length);
+
+      statsDiv.innerHTML = `
+        <div class="stat-card">
+          <div class="number">${wrestlers.length}</div>
+          <div class="label">Total Wrestlers</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${activeWrestlers}</div>
+          <div class="label">Active Wrestlers</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${avgRating}</div>
+          <div class="label">Average Rating</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${avgAge}</div>
+          <div class="label">Average Age</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${avgCondition}%</div>
+          <div class="label">Avg Physical Condition</div>
+        </div>
+      `;
+
+      // Display top wrestlers
+      const top10 = manager.getTopWrestlers(10);
+      topDiv.innerHTML = `
+        <div class="wrestler-grid">
+          ${top10.map((w, index) => `
+            <div class="wrestler-card" onclick="showWrestlerDetail('${w.id}')">
+              <h3>#${index + 1} ${w.name}</h3>
+              <div class="info">
+                <div class="info-item"><strong>Rating:</strong> ${w.getOverallRating()}</div>
+                <div class="info-item"><strong>Style:</strong> ${w.workingStyle}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // Load sample wrestlers
+    function loadSampleWrestlers() {
+      loadSampleData(manager);
+      displayWrestlers();
+      alert('Sample data loaded successfully!');
+    }
+
+    // Export data
+    function exportData() {
+      const data = manager.exportWrestlers();
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'wrestlers-export.json';
+      a.click();
+    }
+
+    // Clear all data
+    function clearAllData() {
+      if (confirm('Are you sure you want to clear all wrestler data?')) {
+        manager.clearAll();
+        displayWrestlers();
+        alert('All data cleared.');
+      }
+    }
+
+    // Spinner functionality
+    let canvas, ctx, resultDisplay;
+    let angle = 0;
+    let spinning = false;
+
+    function initializeSpinner() {
+      canvas = document.getElementById('wheelCanvas');
+      ctx = canvas.getContext('2d');
+      resultDisplay = document.getElementById('result');
+
+      const wrestlers = manager.getAllWrestlers();
+      if (wrestlers.length > 0) {
+        drawWheel();
+      } else {
+        ctx.fillStyle = '#f5f5f5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#666';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No wrestlers available', 300, 300);
+      }
+    }
+
+    function drawWheel() {
+      const wrestlers = manager.getAllWrestlers();
+      if (wrestlers.length === 0) return;
+
+      const sectionCount = wrestlers.length;
+      const anglePerSection = (2 * Math.PI) / sectionCount;
+
+      for (let i = 0; i < sectionCount; i++) {
+        const sectionAngle = i * anglePerSection;
+        ctx.beginPath();
+        ctx.moveTo(300, 300);
+        ctx.arc(300, 300, 300, sectionAngle, sectionAngle + anglePerSection);
+        ctx.fillStyle = i % 2 === 0 ? '#fbb' : '#bdf';
+        ctx.fill();
+        ctx.save();
+        ctx.translate(300, 300);
+        ctx.rotate(sectionAngle + anglePerSection / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#000';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(wrestlers[i].name, 290, 5);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      const wrestlers = manager.getAllWrestlers();
+      if (wrestlers.length === 0) {
+        alert('Please load wrestler data first!');
+        return;
+      }
+
+      if (spinning) return;
+      spinning = true;
+
+      const spinTime = 4000;
+      const start = Date.now();
+      const sectionCount = wrestlers.length;
+      const anglePerSection = (2 * Math.PI) / sectionCount;
+
+      const spin = () => {
+        const elapsed = Date.now() - start;
+        angle += 0.05 + (Math.max(0, spinTime - elapsed) / spinTime) * 0.3;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(300, 300);
+        ctx.rotate(angle);
+        ctx.translate(-300, -300);
+        drawWheel();
+        ctx.restore();
+
+        if (elapsed < spinTime) {
+          requestAnimationFrame(spin);
+        } else {
+          spinning = false;
+          const selected = Math.floor((sectionCount - ((angle % (2 * Math.PI)) / anglePerSection)) % sectionCount);
+          const selectedWrestler = wrestlers[selected];
+          resultDisplay.textContent = `Selected: ${selectedWrestler.name} (Rating: ${selectedWrestler.getOverallRating()})`;
+        }
+      };
+      spin();
+    }
+
+    // Initialize on page load
+    displayWrestlers();
+  </script>
+</body>
+</html>
