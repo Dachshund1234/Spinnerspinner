@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>UI Demo Walkthrough - Pro Wrestling Simulator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .demo-section h2 {
+      color: #764ba2;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .demo-section h3 {
+      color: #667eea;
+      margin-top: 20px;
+    }
+
+    .visual-example {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      background: #fafafa;
+      margin: 20px 0;
+    }
+
+    .card-demo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .mini-card {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .mini-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+    }
+
+    .mini-card h4 {
+      color: #333;
+      margin: 0 0 10px 0;
+    }
+
+    .mini-card .rating {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .progress-demo {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .progress-fill-demo {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+    }
+
+    .nav-demo {
+      display: flex;
+      background: #f5f5f5;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .nav-item {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      background: #f5f5f5;
+      color: #666;
+      font-weight: 600;
+      border: 2px solid transparent;
+    }
+
+    .nav-item.active {
+      background: white;
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+    }
+
+    .stat-card-demo {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid #e0e0e0;
+    }
+
+    .stat-card-demo .number {
+      font-size: 3em;
+      font-weight: bold;
+      color: #667eea;
+      margin: 10px 0;
+    }
+
+    .stat-card-demo .label {
+      color: #666;
+      font-size: 1em;
+    }
+
+    .button-demo {
+      display: inline-block;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .btn-primary-demo {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-secondary-demo {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .color-palette {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .color-box {
+      padding: 40px 20px;
+      border-radius: 8px;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .instructions {
+      background: #e8eaf6;
+      border-left: 4px solid #667eea;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+
+    .instructions strong {
+      color: #667eea;
+    }
+
+    .feature-list {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .feature-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: 10px;
+      margin: 5px 0;
+      background: white;
+      border-radius: 5px;
+      border-left: 3px solid #667eea;
+    }
+
+    .feature-list li:before {
+      content: "✓ ";
+      color: #667eea;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #667eea;
+    }
+
+    .link-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .link-box h2 {
+      color: white;
+      border: none;
+      margin: 0 0 15px 0;
+    }
+
+    .link-box a {
+      color: white;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-decoration: none;
+      background: rgba(255,255,255,0.2);
+      padding: 15px 30px;
+      border-radius: 8px;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+
+    .link-box a:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>🤼‍♂️ Pro Wrestling Simulator - UI Demo</h1>
+  <p class="subtitle">Interactive walkthrough of all UI components and features</p>
+
+  <div class="link-box">
+    <h2>🚀 Open the Full Application</h2>
+    <a href="index.html" target="_blank">Launch Pro Wrestling Simulator →</a>
+  </div>
+
+  <div class="demo-section">
+    <h2>📊 Navigation System</h2>
+    <p>The application features a tab-based navigation system with 4 main sections:</p>
+    <div class="nav-demo">
+      <div class="nav-item active">ROSTER</div>
+      <div class="nav-item">WRESTLER DETAILS</div>
+      <div class="nav-item">STATISTICS</div>
+      <div class="nav-item">SPINNER</div>
+    </div>
+    <p><strong>Active tab</strong> is highlighted with purple text and bottom border.</p>
+  </div>
+
+  <div class="demo-section">
+    <h2>🎴 Wrestler Cards</h2>
+    <p>Each wrestler is displayed in an interactive card with hover effects:</p>
+    <div class="card-demo">
+      <div class="mini-card">
+        <h4>Roman Reigns</h4>
+        <div style="font-size: 0.9em; color: #666;">
+          <div>Age: 38</div>
+          <div>Style: Powerhouse</div>
+          <div>Country: USA</div>
+          <div>Status: Active</div>
+        </div>
+        <div class="rating">Overall Rating: 88</div>
+      </div>
+
+      <div class="mini-card">
+        <h4>Seth Rollins</h4>
+        <div style="font-size: 0.9em; color: #666;">
+          <div>Age: 37</div>
+          <div>Style: High Flyer</div>
+          <div>Country: USA</div>
+          <div>Status: Active</div>
+        </div>
+        <div class="rating">Overall Rating: 86</div>
+      </div>
+
+      <div class="mini-card">
+        <h4>Gunther</h4>
+        <div style="font-size: 0.9em; color: #666;">
+          <div>Age: 36</div>
+          <div>Style: Strong Style</div>
+          <div>Country: Austria</div>
+          <div>Status: Active</div>
+        </div>
+        <div class="rating">Overall Rating: 87</div>
+      </div>
+    </div>
+    <div class="instructions">
+      <strong>Try hovering over cards</strong> - They lift up with a shadow effect!<br>
+      <strong>Click any card</strong> - View detailed wrestler information
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>📈 Progress Bars</h2>
+    <p>All attributes use visual progress bars to show values at a glance:</p>
+    <div class="visual-example">
+      <div style="margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>Brawling</span>
+          <span style="font-weight: bold;">88/100</span>
+        </div>
+        <div class="progress-demo">
+          <div class="progress-fill-demo" style="width: 88%;"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>Technical Wrestling</span>
+          <span style="font-weight: bold;">75/100</span>
+        </div>
+        <div class="progress-demo">
+          <div class="progress-fill-demo" style="width: 75%;"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>Star Power</span>
+          <span style="font-weight: bold;">98/100</span>
+        </div>
+        <div class="progress-demo">
+          <div class="progress-fill-demo" style="width: 98%;"></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>High Flying</span>
+          <span style="font-weight: bold;">45/100</span>
+        </div>
+        <div class="progress-demo">
+          <div class="progress-fill-demo" style="width: 45%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>📊 Statistics Dashboard</h2>
+    <p>The statistics tab shows roster analytics in large, easy-to-read cards:</p>
+    <div class="card-demo">
+      <div class="stat-card-demo">
+        <div class="number">10</div>
+        <div class="label">Total Wrestlers</div>
+      </div>
+      <div class="stat-card-demo">
+        <div class="number">10</div>
+        <div class="label">Active Wrestlers</div>
+      </div>
+      <div class="stat-card-demo">
+        <div class="number">87</div>
+        <div class="label">Average Rating</div>
+      </div>
+      <div class="stat-card-demo">
+        <div class="number">38</div>
+        <div class="label">Average Age</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>🎨 Color Palette</h2>
+    <p>The application uses a professional purple gradient theme:</p>
+    <div class="color-palette">
+      <div class="color-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        Primary Gradient
+      </div>
+      <div class="color-box" style="background: #667eea;">
+        Primary Purple
+      </div>
+      <div class="color-box" style="background: #764ba2;">
+        Accent Violet
+      </div>
+      <div class="color-box" style="background: #333; color: white;">
+        Text Dark
+      </div>
+      <div class="color-box" style="background: #f5f5f5; color: #333;">
+        Background Light
+      </div>
+      <div class="color-box" style="background: #e0e0e0; color: #333;">
+        Border Gray
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>🎮 Interactive Buttons</h2>
+    <p>Multiple button styles for different actions:</p>
+    <div style="text-align: center; padding: 20px;">
+      <button class="button-demo btn-primary-demo">Load Sample Data</button>
+      <button class="button-demo btn-secondary-demo">Export Data</button>
+      <button class="button-demo btn-secondary-demo">Clear All</button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>✨ Key Features</h2>
+    <div class="feature-list">
+      <ul>
+        <li><strong>Responsive Grid Layout</strong> - Cards automatically adjust to screen size</li>
+        <li><strong>Search Functionality</strong> - Real-time filtering as you type</li>
+        <li><strong>Detailed Profiles</strong> - View all 100+ data points per wrestler</li>
+        <li><strong>Progress Visualization</strong> - All attributes shown with purple gradient bars</li>
+        <li><strong>Regional Popularity</strong> - See popularity breakdown by country/state</li>
+        <li><strong>Physical Condition</strong> - Track 6 body parts independently</li>
+        <li><strong>10 Wrestling Attributes</strong> - Comprehensive skill system</li>
+        <li><strong>Statistics Dashboard</strong> - Roster analytics and top performers</li>
+        <li><strong>Random Spinner</strong> - Animated wheel for random selection</li>
+        <li><strong>Data Management</strong> - Export/Import via JSON files</li>
+        <li><strong>localStorage Persistence</strong> - Data saved automatically</li>
+        <li><strong>Hover Effects</strong> - Smooth animations throughout</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>🎯 How to Use</h2>
+    <div class="instructions">
+      <h3 style="color: #667eea; margin-top: 0;">Step-by-Step Guide:</h3>
+      <ol style="line-height: 2;">
+        <li><strong>Open the app</strong> - Click the link at the top of this page</li>
+        <li><strong>Load sample data</strong> - Click "Load Sample Data" button</li>
+        <li><strong>Browse roster</strong> - Scroll through the wrestler cards</li>
+        <li><strong>Search wrestlers</strong> - Type in the search box (try "Roman")</li>
+        <li><strong>View details</strong> - Click any wrestler card to see full profile</li>
+        <li><strong>Check statistics</strong> - Switch to Statistics tab for analytics</li>
+        <li><strong>Use spinner</strong> - Go to Spinner tab and click "Spin the Wheel!"</li>
+        <li><strong>Export data</strong> - Save your roster as JSON backup</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>🎡 Spinner Wheel Preview</h2>
+    <p>The spinner tab features an animated wheel with:</p>
+    <div class="feature-list">
+      <ul>
+        <li><strong>All wrestlers included</strong> - Each gets their own colored section</li>
+        <li><strong>Alternating colors</strong> - Pink and blue sections</li>
+        <li><strong>4-second spin animation</strong> - Smooth deceleration effect</li>
+        <li><strong>Random selection</strong> - Fair probability for all wrestlers</li>
+        <li><strong>Result display</strong> - Shows selected wrestler and their rating</li>
+      </ul>
+    </div>
+    <div class="visual-example" style="text-align: center;">
+      <div style="display: inline-block; width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, #fbb 0%, #fbb 50%, #bdf 50%, #bdf 100%); border: 3px solid #333; position: relative;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2em; font-weight: bold; color: #333; background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 8px;">
+          🎡 Spin!
+        </div>
+      </div>
+      <p style="margin-top: 20px; color: #666;"><em>Actual wheel shows all wrestler names around the edge</em></p>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>💡 Pro Tips</h2>
+    <div class="instructions">
+      <ul style="line-height: 2; list-style: none; padding: 0;">
+        <li>🔍 <strong>Use search</strong> to quickly find specific wrestlers</li>
+        <li>🖱️ <strong>Hover over cards</strong> to see the lift animation</li>
+        <li>📊 <strong>Check Statistics tab</strong> to see who has the highest ratings</li>
+        <li>💾 <strong>Export regularly</strong> to backup your roster</li>
+        <li>🎯 <strong>Click wrestler cards</strong> to see all 100+ data points</li>
+        <li>🎡 <strong>Use the spinner</strong> for random match selection</li>
+        <li>📱 <strong>Works on mobile</strong> - responsive design adjusts to any screen</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="link-box">
+    <h2>Ready to explore? 🚀</h2>
+    <a href="index.html" target="_blank">Open Pro Wrestling Simulator →</a>
+    <p style="margin-top: 20px; opacity: 0.9;">Or navigate to: <code style="background: rgba(255,255,255,0.2); color: white;">http://localhost:8080/index.html</code></p>
+  </div>
+
+  <div style="text-align: center; padding: 40px 20px; color: #666;">
+    <p><strong>Pro Wrestling Simulator</strong> - Built with HTML5, CSS3, and Vanilla JavaScript</p>
+    <p>Featuring comprehensive wrestler management with 100+ attributes per wrestler</p>
+  </div>
+</body>
+</html>
