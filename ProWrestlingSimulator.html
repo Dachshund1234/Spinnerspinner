@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pro Wrestling Simulator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: #f5f5f5;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      background: #f5f5f5;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.3s;
+    }
+
+    .nav-tab:hover {
+      background: #e0e0e0;
+    }
+
+    .nav-tab.active {
+      background: white;
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 30px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .wrestler-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .wrestler-card {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px;
+      background: #fafafa;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .wrestler-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      border-color: #667eea;
+    }
+
+    .wrestler-card h3 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 1.3em;
+    }
+
+    .wrestler-card .info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .wrestler-card .info-item {
+      background: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .wrestler-card .rating {
+      margin-top: 15px;
+      padding: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .wrestler-detail {
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 30px;
+      margin-top: 20px;
+    }
+
+    .detail-section {
+      margin-bottom: 30px;
+    }
+
+    .detail-section h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .attribute-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .attribute-item {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .attribute-item label {
+      display: block;
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .attribute-item .value {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border: 2px solid #e0e0e0;
+    }
+
+    .stat-card .number {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .stat-card .label {
+      color: #666;
+      font-size: 1em;
+    }
+
+    #wheelCanvas {
+      border: 2px solid #333;
+      border-radius: 50%;
+      margin: 20px auto;
+      display: block;
+    }
+
+    .actions {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .back-btn {
+      background: #666;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Pro Wrestling Simulator</h1>
+      <p>Manage your wrestling roster like a pro</p>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('roster')">Roster</button>
+      <button class="nav-tab" onclick="switchTab('details')">Wrestler Details</button>
+      <button class="nav-tab" onclick="switchTab('stats')">Statistics</button>
+      <button class="nav-tab" onclick="switchTab('spinner')">Spinner</button>
+    </div>
+
+    <div id="roster" class="tab-content active">
+      <input type="text" class="search-box" id="searchBox" placeholder="Search wrestlers..." onkeyup="searchWrestlers()">
+      <div class="actions">
+        <button class="btn btn-primary" onclick="loadSampleWrestlers()">Load Sample Data</button>
+        <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+        <button class="btn btn-secondary" onclick="clearAllData()">Clear All</button>
+      </div>
+      <div id="wrestlerGrid" class="wrestler-grid"></div>
+    </div>
+
+    <div id="details" class="tab-content">
+      <button class="back-btn" onclick="switchTab('roster')">← Back to Roster</button>
+      <div id="wrestlerDetail"></div>
+    </div>
+
+    <div id="stats" class="tab-content">
+      <h2 style="margin-bottom: 20px;">Roster Statistics</h2>
+      <div class="stats-overview" id="statsOverview"></div>
+      <div class="detail-section">
+        <h3>Top 10 Wrestlers by Overall Rating</h3>
+        <div id="topWrestlers"></div>
+      </div>
+    </div>
+
+    <div id="spinner" class="tab-content">
+      <h2 style="text-align: center; margin-bottom: 20px;">Random Wrestler Selector</h2>
+      <canvas id="wheelCanvas" width="600" height="600"></canvas>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="spinWheel()">Spin the Wheel!</button>
+        <h2 id="result"></h2>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== WRESTLER MODEL ==========
+    class Wrestler {
+      constructor(data = {}) {
+        this.id = data.id || this.generateId();
+        this.name = data.name || '';
+        this.age = data.age || 18;
+        this.sexuality = data.sexuality || 'Heterosexual';
+        this.workerType = data.workerType || 'Singles';
+        this.status = data.status || 'Active';
+        this.workingStyle = data.workingStyle || 'All-Rounder';
+        this.height = data.height || 180;
+        this.weight = data.weight || 90;
+        this.birthDate = data.birthDate || new Date();
+        this.debutDate = data.debutDate || new Date();
+        this.basedInContinent = data.basedInContinent || 'North America';
+        this.basedInCountry = data.basedInCountry || 'USA';
+        this.basedInCity = data.basedInCity || '';
+        this.popularity = data.popularity || {};
+        this.physicalCondition = {
+          brain: data.physicalCondition?.brain || 100,
+          body: data.physicalCondition?.body || 100,
+          neck: data.physicalCondition?.neck || 100,
+          chest: data.physicalCondition?.chest || 100,
+          legs: data.physicalCondition?.legs || 100,
+          arms: data.physicalCondition?.arms || 100
+        };
+        this.brawling = data.brawling || 50;
+        this.technicalWrestling = data.technicalWrestling || 50;
+        this.starPower = data.starPower || 50;
+        this.highFlying = data.highFlying || 50;
+        this.hardcore = data.hardcore || 50;
+        this.safety = data.safety || 50;
+        this.dramaticActing = data.dramaticActing || 50;
+        this.wrestlingPsychology = data.wrestlingPsychology || 50;
+        this.fatigue = data.fatigue || 0;
+        this.playByPlay = data.playByPlay || 50;
+        this.collar = data.collar || 'Blue Collar';
+        this.profilePicture = data.profilePicture || null;
+      }
+
+      generateId() {
+        return 'WR-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      }
+
+      getOverallRating() {
+        const attributes = [
+          this.brawling, this.technicalWrestling, this.starPower,
+          this.highFlying, this.hardcore, this.safety,
+          this.dramaticActing, this.wrestlingPsychology
+        ];
+        return Math.round(attributes.reduce((a, b) => a + b, 0) / attributes.length);
+      }
+
+      getPhysicalConditionRating() {
+        const conditions = Object.values(this.physicalCondition);
+        return Math.round(conditions.reduce((a, b) => a + b, 0) / conditions.length);
+      }
+
+      getYearsOfExperience() {
+        const today = new Date();
+        const debut = new Date(this.debutDate);
+        const years = (today - debut) / (1000 * 60 * 60 * 24 * 365.25);
+        return Math.max(0, Math.floor(years));
+      }
+
+      toJSON() {
+        return {
+          id: this.id,
+          name: this.name,
+          age: this.age,
+          sexuality: this.sexuality,
+          workerType: this.workerType,
+          status: this.status,
+          workingStyle: this.workingStyle,
+          height: this.height,
+          weight: this.weight,
+          birthDate: this.birthDate,
+          debutDate: this.debutDate,
+          basedInContinent: this.basedInContinent,
+          basedInCountry: this.basedInCountry,
+          basedInCity: this.basedInCity,
+          popularity: this.popularity,
+          physicalCondition: this.physicalCondition,
+          brawling: this.brawling,
+          technicalWrestling: this.technicalWrestling,
+          starPower: this.starPower,
+          highFlying: this.highFlying,
+          hardcore: this.hardcore,
+          safety: this.safety,
+          dramaticActing: this.dramaticActing,
+          wrestlingPsychology: this.wrestlingPsychology,
+          fatigue: this.fatigue,
+          playByPlay: this.playByPlay,
+          collar: this.collar,
+          profilePicture: this.profilePicture
+        };
+      }
+
+      static fromJSON(json) {
+        return new Wrestler(json);
+      }
+    }
+
+    class WrestlerManager {
+      constructor() {
+        this.wrestlers = [];
+        this.loadFromStorage();
+      }
+
+      addWrestler(wrestlerData) {
+        const wrestler = new Wrestler(wrestlerData);
+        this.wrestlers.push(wrestler);
+        this.saveToStorage();
+        return wrestler;
+      }
+
+      getWrestlerById(id) {
+        return this.wrestlers.find(w => w.id === id);
+      }
+
+      getAllWrestlers() {
+        return this.wrestlers;
+      }
+
+      searchWrestlers(query) {
+        const lowerQuery = query.toLowerCase();
+        return this.wrestlers.filter(w =>
+          w.name.toLowerCase().includes(lowerQuery)
+        );
+      }
+
+      getTopWrestlers(limit = 10) {
+        return [...this.wrestlers]
+          .sort((a, b) => b.getOverallRating() - a.getOverallRating())
+          .slice(0, limit);
+      }
+
+      saveToStorage() {
+        if (typeof localStorage !== 'undefined') {
+          const data = this.wrestlers.map(w => w.toJSON());
+          localStorage.setItem('wrestlers', JSON.stringify(data));
+        }
+      }
+
+      loadFromStorage() {
+        if (typeof localStorage !== 'undefined') {
+          const data = localStorage.getItem('wrestlers');
+          if (data) {
+            const parsed = JSON.parse(data);
+            this.wrestlers = parsed.map(w => Wrestler.fromJSON(w));
+          }
+        }
+      }
+
+      clearAll() {
+        this.wrestlers = [];
+        this.saveToStorage();
+      }
+
+      importWrestlers(jsonArray) {
+        jsonArray.forEach(data => {
+          this.addWrestler(data);
+        });
+      }
+
+      exportWrestlers() {
+        return this.wrestlers.map(w => w.toJSON());
+      }
+    }
+
+    // ========== SAMPLE DATA ==========
+    const sampleWrestlersData = [
+  {
+    id: 'WR-001',
+    name: 'Roman Reigns',
+    age: 38,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'Powerhouse',
+    height: 191,
+    weight: 120,
+    birthDate: '1985-05-25',
+    debutDate: '2010-08-20',
+    basedInContinent: 'North America',
+    basedInCountry: 'USA',
+    basedInCity: 'Pensacola',
+    popularity: {
+      'USA': {'California': 95, 'Texas': 92, 'Florida': 97, 'New York': 94},
+      'UK': {'London': 85},
+      'Japan': {'Tokyo': 78}
+    },
+    physicalCondition: {brain: 95, body: 92, neck: 90, chest: 95, legs: 93, arms: 94},
+    brawling: 88,
+    technicalWrestling: 75,
+    starPower: 98,
+    highFlying: 45,
+    hardcore: 70,
+    safety: 85,
+    dramaticActing: 92,
+    wrestlingPsychology: 95,
+    fatigue: 15,
+    playByPlay: 88,
+    collar: 'White Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-002',
+    name: 'Seth Rollins',
+    age: 37,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'High Flyer',
+    height: 185,
+    weight: 102,
+    birthDate: '1986-05-28',
+    debutDate: '2005-06-15',
+    basedInContinent: 'North America',
+    basedInCountry: 'USA',
+    basedInCity: 'Davenport',
+    popularity: {
+      'USA': {'California': 88, 'Texas': 85, 'Illinois': 92, 'New York': 89},
+      'Canada': {'Toronto': 82},
+      'Mexico': {'Mexico City': 75}
+    },
+    physicalCondition: {brain: 92, body: 88, neck: 85, chest: 90, legs: 87, arms: 89},
+    brawling: 82,
+    technicalWrestling: 88,
+    starPower: 90,
+    highFlying: 92,
+    hardcore: 78,
+    safety: 88,
+    dramaticActing: 85,
+    wrestlingPsychology: 90,
+    fatigue: 20,
+    playByPlay: 85,
+    collar: 'White Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-003',
+    name: 'Cody Rhodes',
+    age: 38,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'All-Rounder',
+    height: 188,
+    weight: 100,
+    birthDate: '1985-06-30',
+    debutDate: '2006-01-20',
+    basedInContinent: 'North America',
+    basedInCountry: 'USA',
+    basedInCity: 'Atlanta',
+    popularity: {
+      'USA': {'California': 92, 'Texas': 88, 'Georgia': 98, 'New York': 91},
+      'Japan': {'Tokyo': 85, 'Osaka': 82},
+      'UK': {'London': 88}
+    },
+    physicalCondition: {brain: 94, body: 90, neck: 88, chest: 92, legs: 89, arms: 91},
+    brawling: 85,
+    technicalWrestling: 86,
+    starPower: 95,
+    highFlying: 70,
+    hardcore: 75,
+    safety: 90,
+    dramaticActing: 94,
+    wrestlingPsychology: 93,
+    fatigue: 10,
+    playByPlay: 90,
+    collar: 'White Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-004',
+    name: 'Rey Mysterio',
+    age: 49,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'High Flyer',
+    height: 168,
+    weight: 79,
+    birthDate: '1974-12-11',
+    debutDate: '1989-04-30',
+    basedInContinent: 'North America',
+    basedInCountry: 'USA',
+    basedInCity: 'San Diego',
+    popularity: {
+      'USA': {'California': 96, 'Texas': 92, 'New York': 90},
+      'Mexico': {'Mexico City': 98, 'Tijuana': 99, 'Guadalajara': 97},
+      'Japan': {'Tokyo': 88}
+    },
+    physicalCondition: {brain: 85, body: 78, neck: 75, chest: 80, legs: 76, arms: 79},
+    brawling: 70,
+    technicalWrestling: 88,
+    starPower: 95,
+    highFlying: 98,
+    hardcore: 72,
+    safety: 92,
+    dramaticActing: 88,
+    wrestlingPsychology: 96,
+    fatigue: 35,
+    playByPlay: 92,
+    collar: 'Blue Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-005',
+    name: 'Gunther',
+    age: 36,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'Strong Style',
+    height: 196,
+    weight: 140,
+    birthDate: '1987-08-20',
+    debutDate: '2007-03-15',
+    basedInContinent: 'Europe',
+    basedInCountry: 'Austria',
+    basedInCity: 'Vienna',
+    popularity: {
+      'USA': {'California': 82, 'Texas': 80, 'New York': 85},
+      'Austria': {'Vienna': 95},
+      'Germany': {'Berlin': 92, 'Munich': 90},
+      'UK': {'London': 88}
+    },
+    physicalCondition: {brain: 96, body: 95, neck: 94, chest: 98, legs: 93, arms: 96},
+    brawling: 92,
+    technicalWrestling: 95,
+    starPower: 88,
+    highFlying: 40,
+    hardcore: 65,
+    safety: 94,
+    dramaticActing: 82,
+    wrestlingPsychology: 96,
+    fatigue: 8,
+    playByPlay: 85,
+    collar: 'Blue Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-006',
+    name: 'Rhea Ripley',
+    age: 27,
+    sexuality: 'Bisexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'Powerhouse',
+    height: 173,
+    weight: 72,
+    birthDate: '1996-10-11',
+    debutDate: '2013-02-20',
+    basedInContinent: 'Oceania',
+    basedInCountry: 'Australia',
+    basedInCity: 'Adelaide',
+    popularity: {
+      'USA': {'California': 89, 'Texas': 86, 'New York': 91},
+      'Australia': {'Adelaide': 98, 'Sydney': 95, 'Melbourne': 94},
+      'UK': {'London': 87}
+    },
+    physicalCondition: {brain: 95, body: 92, neck: 90, chest: 91, legs: 93, arms: 94},
+    brawling: 88,
+    technicalWrestling: 82,
+    starPower: 93,
+    highFlying: 68,
+    hardcore: 85,
+    safety: 87,
+    dramaticActing: 90,
+    wrestlingPsychology: 88,
+    fatigue: 12,
+    playByPlay: 86,
+    collar: 'Blue Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-007',
+    name: 'AJ Styles',
+    age: 46,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'All-Rounder',
+    height: 180,
+    weight: 99,
+    birthDate: '1977-06-02',
+    debutDate: '1998-03-15',
+    basedInContinent: 'North America',
+    basedInCountry: 'USA',
+    basedInCity: 'Gainesville',
+    popularity: {
+      'USA': {'California': 90, 'Texas': 92, 'Georgia': 96, 'New York': 88},
+      'Japan': {'Tokyo': 95, 'Osaka': 93},
+      'Mexico': {'Mexico City': 85}
+    },
+    physicalCondition: {brain: 88, body: 82, neck: 80, chest: 85, legs: 81, arms: 84},
+    brawling: 82,
+    technicalWrestling: 95,
+    starPower: 92,
+    highFlying: 90,
+    hardcore: 75,
+    safety: 96,
+    dramaticActing: 86,
+    wrestlingPsychology: 98,
+    fatigue: 28,
+    playByPlay: 94,
+    collar: 'Blue Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-008',
+    name: 'Drew McIntyre',
+    age: 38,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'Powerhouse',
+    height: 196,
+    weight: 120,
+    birthDate: '1985-06-06',
+    debutDate: '2001-08-10',
+    basedInContinent: 'Europe',
+    basedInCountry: 'Scotland',
+    basedInCity: 'Ayr',
+    popularity: {
+      'USA': {'California': 85, 'Texas': 82, 'New York': 87},
+      'UK': {'London': 92, 'Glasgow': 98, 'Edinburgh': 97},
+      'Scotland': {'Ayr': 99}
+    },
+    physicalCondition: {brain: 93, body: 91, neck: 89, chest: 94, legs: 90, arms: 92},
+    brawling: 90,
+    technicalWrestling: 82,
+    starPower: 89,
+    highFlying: 55,
+    hardcore: 80,
+    safety: 88,
+    dramaticActing: 84,
+    wrestlingPsychology: 90,
+    fatigue: 18,
+    playByPlay: 87,
+    collar: 'Blue Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-009',
+    name: 'Iyo Sky',
+    age: 33,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'High Flyer',
+    height: 157,
+    weight: 52,
+    birthDate: '1990-05-08',
+    debutDate: '2007-06-15',
+    basedInContinent: 'Asia',
+    basedInCountry: 'Japan',
+    basedInCity: 'Tokyo',
+    popularity: {
+      'USA': {'California': 84, 'Texas': 78, 'New York': 82},
+      'Japan': {'Tokyo': 98, 'Osaka': 96, 'Nagoya': 94},
+      'Mexico': {'Mexico City': 80}
+    },
+    physicalCondition: {brain: 94, body: 90, neck: 88, chest: 89, legs: 91, arms: 90},
+    brawling: 72,
+    technicalWrestling: 88,
+    starPower: 86,
+    highFlying: 97,
+    hardcore: 70,
+    safety: 92,
+    dramaticActing: 85,
+    wrestlingPsychology: 91,
+    fatigue: 14,
+    playByPlay: 88,
+    collar: 'Blue Collar',
+    profilePicture: null
+  },
+  {
+    id: 'WR-010',
+    name: 'Bronson Reed',
+    age: 35,
+    sexuality: 'Heterosexual',
+    workerType: 'Singles',
+    status: 'Active',
+    workingStyle: 'Super Heavyweight',
+    height: 183,
+    weight: 159,
+    birthDate: '1988-08-18',
+    debutDate: '2007-04-20',
+    basedInContinent: 'Oceania',
+    basedInCountry: 'Australia',
+    basedInCity: 'Adelaide',
+    popularity: {
+      'USA': {'California': 76, 'Texas': 78, 'New York': 74},
+      'Australia': {'Adelaide': 92, 'Sydney': 88, 'Melbourne': 86}
+    },
+    physicalCondition: {brain: 92, body: 88, neck: 86, chest: 90, legs: 85, arms: 89},
+    brawling: 88,
+    technicalWrestling: 70,
+    starPower: 78,
+    highFlying: 72,
+    hardcore: 85,
+    safety: 82,
+    dramaticActing: 75,
+    wrestlingPsychology: 80,
+    fatigue: 22,
+    playByPlay: 76,
+    collar: 'Blue Collar',
+    profilePicture: null
+  }
+];
+
+    // ========== APP LOGIC ==========
+    const manager = new WrestlerManager();
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+
+      if (tabName === 'roster') {
+        displayWrestlers();
+      } else if (tabName === 'stats') {
+        displayStats();
+      } else if (tabName === 'spinner') {
+        initializeSpinner();
+      }
+    }
+
+    function displayWrestlers(wrestlers = null) {
+      const grid = document.getElementById('wrestlerGrid');
+      const wrestlerList = wrestlers || manager.getAllWrestlers();
+
+      if (wrestlerList.length === 0) {
+        grid.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No wrestlers found. Click "Load Sample Data" to get started.</p>';
+        return;
+      }
+
+      grid.innerHTML = wrestlerList.map(w => `
+        <div class="wrestler-card" onclick="showWrestlerDetail('${w.id}')">
+          <h3>${w.name}</h3>
+          <div class="info">
+            <div class="info-item"><strong>Age:</strong> ${w.age}</div>
+            <div class="info-item"><strong>Style:</strong> ${w.workingStyle}</div>
+            <div class="info-item"><strong>Country:</strong> ${w.basedInCountry}</div>
+            <div class="info-item"><strong>Status:</strong> ${w.status}</div>
+          </div>
+          <div class="rating">Overall Rating: ${w.getOverallRating()}</div>
+        </div>
+      `).join('');
+    }
+
+    function searchWrestlers() {
+      const query = document.getElementById('searchBox').value;
+      if (query.trim() === '') {
+        displayWrestlers();
+      } else {
+        const results = manager.searchWrestlers(query);
+        displayWrestlers(results);
+      }
+    }
+
+    function showWrestlerDetail(id) {
+      const wrestler = manager.getWrestlerById(id);
+      if (!wrestler) return;
+
+      switchTab('details');
+
+      const detailDiv = document.getElementById('wrestlerDetail');
+      detailDiv.innerHTML = `
+        <div class="wrestler-detail">
+          <h2 style="margin-bottom: 20px; color: #667eea;">${wrestler.name}</h2>
+
+          <div class="detail-section">
+            <h3>Basic Information</h3>
+            <div class="attribute-grid">
+              <div class="attribute-item">
+                <label>ID</label>
+                <div class="value">${wrestler.id}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Age</label>
+                <div class="value">${wrestler.age} years</div>
+              </div>
+              <div class="attribute-item">
+                <label>Sexuality</label>
+                <div class="value">${wrestler.sexuality}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Worker Type</label>
+                <div class="value">${wrestler.workerType}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Status</label>
+                <div class="value">${wrestler.status}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Working Style</label>
+                <div class="value">${wrestler.workingStyle}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Height</label>
+                <div class="value">${wrestler.height} cm</div>
+              </div>
+              <div class="attribute-item">
+                <label>Weight</label>
+                <div class="value">${wrestler.weight} kg</div>
+              </div>
+              <div class="attribute-item">
+                <label>Experience</label>
+                <div class="value">${wrestler.getYearsOfExperience()} years</div>
+              </div>
+              <div class="attribute-item">
+                <label>Location</label>
+                <div class="value">${wrestler.basedInCity}, ${wrestler.basedInCountry}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Collar</label>
+                <div class="value">${wrestler.collar}</div>
+              </div>
+              <div class="attribute-item">
+                <label>Fatigue</label>
+                <div class="value">${wrestler.fatigue}%</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.fatigue}%; background: ${wrestler.fatigue > 70 ? '#e74c3c' : '#667eea'};"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Physical Condition</h3>
+            <div class="attribute-grid">
+              ${Object.entries(wrestler.physicalCondition).map(([part, value]) => `
+                <div class="attribute-item">
+                  <label>${part.charAt(0).toUpperCase() + part.slice(1)}</label>
+                  <div class="value">${value}/100</div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${value}%;"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Wrestling Attributes</h3>
+            <div class="attribute-grid">
+              <div class="attribute-item">
+                <label>Overall Rating</label>
+                <div class="value" style="color: #667eea; font-size: 1.5em;">${wrestler.getOverallRating()}/100</div>
+              </div>
+              <div class="attribute-item">
+                <label>Brawling</label>
+                <div class="value">${wrestler.brawling}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.brawling}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Technical Wrestling</label>
+                <div class="value">${wrestler.technicalWrestling}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.technicalWrestling}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Star Power</label>
+                <div class="value">${wrestler.starPower}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.starPower}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>High Flying</label>
+                <div class="value">${wrestler.highFlying}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.highFlying}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Hardcore</label>
+                <div class="value">${wrestler.hardcore}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.hardcore}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Safety</label>
+                <div class="value">${wrestler.safety}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.safety}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Dramatic Acting</label>
+                <div class="value">${wrestler.dramaticActing}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.dramaticActing}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Wrestling Psychology</label>
+                <div class="value">${wrestler.wrestlingPsychology}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.wrestlingPsychology}%;"></div>
+                </div>
+              </div>
+              <div class="attribute-item">
+                <label>Play By Play</label>
+                <div class="value">${wrestler.playByPlay}/100</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${wrestler.playByPlay}%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Popularity by Region</h3>
+            <div class="attribute-grid">
+              ${Object.entries(wrestler.popularity).map(([country, regions]) =>
+                Object.entries(regions).map(([region, value]) => `
+                  <div class="attribute-item">
+                    <label>${country} - ${region}</label>
+                    <div class="value">${value}/100</div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: ${value}%;"></div>
+                    </div>
+                  </div>
+                `).join('')
+              ).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function displayStats() {
+      const wrestlers = manager.getAllWrestlers();
+      const statsDiv = document.getElementById('statsOverview');
+      const topDiv = document.getElementById('topWrestlers');
+
+      if (wrestlers.length === 0) {
+        statsDiv.innerHTML = '<p style="text-align: center; color: #666;">No data available</p>';
+        topDiv.innerHTML = '';
+        return;
+      }
+
+      const avgRating = Math.round(wrestlers.reduce((sum, w) => sum + w.getOverallRating(), 0) / wrestlers.length);
+      const avgAge = Math.round(wrestlers.reduce((sum, w) => sum + w.age, 0) / wrestlers.length);
+      const activeWrestlers = wrestlers.filter(w => w.status === 'Active').length;
+      const avgCondition = Math.round(wrestlers.reduce((sum, w) => sum + w.getPhysicalConditionRating(), 0) / wrestlers.length);
+
+      statsDiv.innerHTML = `
+        <div class="stat-card">
+          <div class="number">${wrestlers.length}</div>
+          <div class="label">Total Wrestlers</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${activeWrestlers}</div>
+          <div class="label">Active Wrestlers</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${avgRating}</div>
+          <div class="label">Average Rating</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${avgAge}</div>
+          <div class="label">Average Age</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${avgCondition}%</div>
+          <div class="label">Avg Physical Condition</div>
+        </div>
+      `;
+
+      const top10 = manager.getTopWrestlers(10);
+      topDiv.innerHTML = `
+        <div class="wrestler-grid">
+          ${top10.map((w, index) => `
+            <div class="wrestler-card" onclick="showWrestlerDetail('${w.id}')">
+              <h3>#${index + 1} ${w.name}</h3>
+              <div class="info">
+                <div class="info-item"><strong>Rating:</strong> ${w.getOverallRating()}</div>
+                <div class="info-item"><strong>Style:</strong> ${w.workingStyle}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function loadSampleWrestlers() {
+      manager.clearAll();
+      manager.importWrestlers(sampleWrestlersData);
+      displayWrestlers();
+      alert('Sample data loaded successfully!');
+    }
+
+    function exportData() {
+      const data = manager.exportWrestlers();
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'wrestlers-export.json';
+      a.click();
+    }
+
+    function clearAllData() {
+      if (confirm('Are you sure you want to clear all wrestler data?')) {
+        manager.clearAll();
+        displayWrestlers();
+        alert('All data cleared.');
+      }
+    }
+
+    let canvas, ctx, resultDisplay;
+    let angle = 0;
+    let spinning = false;
+
+    function initializeSpinner() {
+      canvas = document.getElementById('wheelCanvas');
+      ctx = canvas.getContext('2d');
+      resultDisplay = document.getElementById('result');
+
+      const wrestlers = manager.getAllWrestlers();
+      if (wrestlers.length > 0) {
+        drawWheel();
+      } else {
+        ctx.fillStyle = '#f5f5f5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#666';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No wrestlers available', 300, 300);
+      }
+    }
+
+    function drawWheel() {
+      const wrestlers = manager.getAllWrestlers();
+      if (wrestlers.length === 0) return;
+
+      const sectionCount = wrestlers.length;
+      const anglePerSection = (2 * Math.PI) / sectionCount;
+
+      for (let i = 0; i < sectionCount; i++) {
+        const sectionAngle = i * anglePerSection;
+        ctx.beginPath();
+        ctx.moveTo(300, 300);
+        ctx.arc(300, 300, 300, sectionAngle, sectionAngle + anglePerSection);
+        ctx.fillStyle = i % 2 === 0 ? '#fbb' : '#bdf';
+        ctx.fill();
+        ctx.save();
+        ctx.translate(300, 300);
+        ctx.rotate(sectionAngle + anglePerSection / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#000';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(wrestlers[i].name, 290, 5);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      const wrestlers = manager.getAllWrestlers();
+      if (wrestlers.length === 0) {
+        alert('Please load wrestler data first!');
+        return;
+      }
+
+      if (spinning) return;
+      spinning = true;
+
+      const spinTime = 4000;
+      const start = Date.now();
+      const sectionCount = wrestlers.length;
+      const anglePerSection = (2 * Math.PI) / sectionCount;
+
+      const spin = () => {
+        const elapsed = Date.now() - start;
+        angle += 0.05 + (Math.max(0, spinTime - elapsed) / spinTime) * 0.3;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(300, 300);
+        ctx.rotate(angle);
+        ctx.translate(-300, -300);
+        drawWheel();
+        ctx.restore();
+
+        if (elapsed < spinTime) {
+          requestAnimationFrame(spin);
+        } else {
+          spinning = false;
+          const selected = Math.floor((sectionCount - ((angle % (2 * Math.PI)) / anglePerSection)) % sectionCount);
+          const selectedWrestler = wrestlers[selected];
+          resultDisplay.textContent = `Selected: ${selectedWrestler.name} (Rating: ${selectedWrestler.getOverallRating()})`;
+        }
+      };
+      spin();
+    }
+
+    displayWrestlers();
+  </script>
+</body>
+</html>
