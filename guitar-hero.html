@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guitar Hero MP3 Player</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin: 20px 0 10px;
+      font-size: 2.5em;
+      text-shadow: 0 0 20px #e94560, 0 0 40px #e94560;
+      letter-spacing: 3px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #e94560, #ff6b6b);
+      color: white;
+      box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(45deg, #0f3460, #16213e);
+      color: #e94560;
+      border: 2px solid #e94560;
+    }
+
+    .btn-secondary:hover {
+      background: #e94560;
+      color: white;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #songName {
+      font-size: 1.2em;
+      color: #e94560;
+      margin-bottom: 10px;
+      min-height: 25px;
+    }
+
+    .game-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #gameCanvas {
+      border: 3px solid #e94560;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+    }
+
+    .stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 15px;
+      font-size: 1.3em;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #e94560;
+      text-shadow: 0 0 10px rgba(233, 69, 96, 0.7);
+    }
+
+    .stat-label {
+      font-size: 0.7em;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .key-hints {
+      margin-top: 15px;
+      display: flex;
+      gap: 20px;
+      font-size: 0.9em;
+    }
+
+    .key-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .key {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .instructions {
+      margin-top: 20px;
+      padding: 15px 25px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .instructions h3 {
+      color: #e94560;
+      margin-bottom: 10px;
+    }
+
+    .instructions p {
+      color: #aaa;
+      font-size: 0.9em;
+      line-height: 1.6;
+    }
+
+    .multiplier-display {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 2em;
+      font-weight: bold;
+      text-shadow: 0 0 20px currentColor;
+    }
+
+    .combo-popup {
+      position: absolute;
+      font-size: 2em;
+      font-weight: bold;
+      pointer-events: none;
+      animation: popUp 0.5s ease-out forwards;
+    }
+
+    @keyframes popUp {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(1.5) translateY(-30px); opacity: 0; }
+    }
+
+    .difficulty-selector {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .difficulty-selector label {
+      color: #aaa;
+    }
+
+    .difficulty-selector select {
+      padding: 8px 15px;
+      border-radius: 5px;
+      background: #16213e;
+      color: white;
+      border: 1px solid #e94560;
+      font-size: 14px;
+    }
+
+    .speed-control {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .speed-control input[type="range"] {
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>GUITAR HERO</h1>
+
+  <div class="controls">
+    <div class="file-input-wrapper">
+      <button class="btn btn-primary">Load MP3</button>
+      <input type="file" id="mp3Input" accept="audio/*">
+    </div>
+    <button id="playBtn" class="btn btn-secondary" disabled>Play</button>
+    <button id="pauseBtn" class="btn btn-secondary" disabled>Pause</button>
+    <button id="restartBtn" class="btn btn-secondary" disabled>Restart</button>
+
+    <div class="difficulty-selector">
+      <label>Difficulty:</label>
+      <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+        <option value="expert">Expert</option>
+      </select>
+    </div>
+
+    <div class="speed-control">
+      <label>Speed:</label>
+      <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1">
+      <span id="speedValue">1.0x</span>
+    </div>
+  </div>
+
+  <div id="songName"></div>
+
+  <div class="game-container">
+    <canvas id="gameCanvas" width="500" height="600"></canvas>
+    <div class="multiplier-display" id="multiplierDisplay"></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="scoreDisplay">0</div>
+      <div class="stat-label">Score</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="comboDisplay">0</div>
+      <div class="stat-label">Combo</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="accuracyDisplay">100%</div>
+      <div class="stat-label">Accuracy</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="streakDisplay">0</div>
+      <div class="stat-label">Best Streak</div>
+    </div>
+  </div>
+
+  <div class="key-hints">
+    <div class="key-hint">
+      <div class="key" style="background: linear-gradient(180deg, #22c55e, #16a34a);">D</div>
+      <span>Green</span>
+    </div>
+    <div class="key-hint">
+      <div class="key" style="background: linear-gradient(180deg, #ef4444, #dc2626);">F</div>
+      <span>Red</span>
+    </div>
+    <div class="key-hint">
+      <div class="key" style="background: linear-gradient(180deg, #eab308, #ca8a04);">J</div>
+      <span>Yellow</span>
+    </div>
+    <div class="key-hint">
+      <div class="key" style="background: linear-gradient(180deg, #3b82f6, #2563eb);">K</div>
+      <span>Blue</span>
+    </div>
+    <div class="key-hint">
+      <div class="key" style="background: linear-gradient(180deg, #f97316, #ea580c);">L</div>
+      <span>Orange</span>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <h3>How to Play</h3>
+    <p>
+      Load an MP3 file and press Play. Notes will automatically generate based on the music's beats.
+      Press the corresponding keys (D, F, J, K, L) when notes reach the hit zone at the bottom.
+      Build combos for higher scores! The game analyzes your music in real-time to create a unique experience.
+    </p>
+  </div>
+
+  <script>
+    // Game Configuration
+    const CONFIG = {
+      lanes: 5,
+      laneWidth: 100,
+      hitZoneY: 520,
+      hitTolerance: 50,
+      perfectTolerance: 20,
+      noteHeight: 30,
+      noteSpeed: 5,
+      colors: ['#22c55e', '#ef4444', '#eab308', '#3b82f6', '#f97316'],
+      keys: ['d', 'f', 'j', 'k', 'l'],
+      difficulty: {
+        easy: { noteFrequency: 0.3, maxSimultaneous: 2 },
+        medium: { noteFrequency: 0.5, maxSimultaneous: 3 },
+        hard: { noteFrequency: 0.7, maxSimultaneous: 4 },
+        expert: { noteFrequency: 0.9, maxSimultaneous: 5 }
+      }
+    };
+
+    // Game State
+    const gameState = {
+      notes: [],
+      score: 0,
+      combo: 0,
+      bestStreak: 0,
+      totalNotes: 0,
+      hitNotes: 0,
+      isPlaying: false,
+      isPaused: false,
+      keysPressed: new Set(),
+      keyFlash: [0, 0, 0, 0, 0],
+      multiplier: 1,
+      lastBeatTime: 0,
+      audioData: null,
+      analyser: null,
+      audioContext: null,
+      source: null,
+      speed: 1
+    };
+
+    // DOM Elements
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const mp3Input = document.getElementById('mp3Input');
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const songNameDisplay = document.getElementById('songName');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const comboDisplay = document.getElementById('comboDisplay');
+    const accuracyDisplay = document.getElementById('accuracyDisplay');
+    const streakDisplay = document.getElementById('streakDisplay');
+    const multiplierDisplay = document.getElementById('multiplierDisplay');
+    const difficultySelect = document.getElementById('difficulty');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedValue = document.getElementById('speedValue');
+
+    let audioElement = null;
+    let animationId = null;
+    let beatData = [];
+
+    // Initialize Audio Context
+    function initAudio() {
+      if (!gameState.audioContext) {
+        gameState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return gameState.audioContext;
+    }
+
+    // Beat Detection using frequency analysis
+    class BeatDetector {
+      constructor(audioContext) {
+        this.audioContext = audioContext;
+        this.analyser = audioContext.createAnalyser();
+        this.analyser.fftSize = 2048;
+        this.bufferLength = this.analyser.frequencyBinCount;
+        this.dataArray = new Uint8Array(this.bufferLength);
+        this.energyHistory = [];
+        this.historySize = 43; // ~1 second at 60fps
+        this.lastBeatTime = 0;
+        this.beatCooldown = 150; // ms between beats
+        this.threshold = 1.3;
+      }
+
+      connect(source) {
+        source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+      }
+
+      detectBeat() {
+        this.analyser.getByteFrequencyData(this.dataArray);
+
+        // Calculate energy in different frequency bands
+        const bass = this.getAverageEnergy(0, 10);      // Low frequencies
+        const mid = this.getAverageEnergy(10, 100);     // Mid frequencies
+        const high = this.getAverageEnergy(100, 200);   // High frequencies
+
+        const totalEnergy = bass * 1.5 + mid + high * 0.5;
+
+        // Keep history for comparison
+        this.energyHistory.push(totalEnergy);
+        if (this.energyHistory.length > this.historySize) {
+          this.energyHistory.shift();
+        }
+
+        // Calculate average energy
+        const averageEnergy = this.energyHistory.reduce((a, b) => a + b, 0) / this.energyHistory.length;
+
+        const now = Date.now();
+        const timeSinceLastBeat = now - this.lastBeatTime;
+
+        // Detect beat if energy exceeds threshold
+        if (totalEnergy > averageEnergy * this.threshold && timeSinceLastBeat > this.beatCooldown) {
+          this.lastBeatTime = now;
+          return {
+            isBeat: true,
+            intensity: totalEnergy / averageEnergy,
+            bass: bass,
+            mid: mid,
+            high: high
+          };
+        }
+
+        return { isBeat: false };
+      }
+
+      getAverageEnergy(startBin, endBin) {
+        let sum = 0;
+        for (let i = startBin; i < endBin && i < this.bufferLength; i++) {
+          sum += this.dataArray[i];
+        }
+        return sum / (endBin - startBin);
+      }
+
+      getFrequencyData() {
+        this.analyser.getByteFrequencyData(this.dataArray);
+        return this.dataArray;
+      }
+    }
+
+    let beatDetector = null;
+
+    // Load MP3 File
+    mp3Input.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      songNameDisplay.textContent = `Loading: ${file.name}...`;
+
+      try {
+        const audioContext = initAudio();
+
+        // Create audio element for playback
+        if (audioElement) {
+          audioElement.pause();
+          audioElement.src = '';
+        }
+
+        audioElement = new Audio();
+        audioElement.src = URL.createObjectURL(file);
+
+        await new Promise((resolve, reject) => {
+          audioElement.onloadeddata = resolve;
+          audioElement.onerror = reject;
+        });
+
+        songNameDisplay.textContent = `Loaded: ${file.name}`;
+        playBtn.disabled = false;
+        restartBtn.disabled = false;
+
+        // Reset game state
+        resetGame();
+
+      } catch (error) {
+        console.error('Error loading audio:', error);
+        songNameDisplay.textContent = 'Error loading file. Please try another.';
+      }
+    });
+
+    // Play Button
+    playBtn.addEventListener('click', async () => {
+      if (!audioElement) return;
+
+      const audioContext = initAudio();
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
+      if (gameState.isPaused) {
+        gameState.isPaused = false;
+        audioElement.play();
+        startGameLoop();
+      } else {
+        // Create new source and beat detector
+        if (gameState.source) {
+          try {
+            gameState.source.disconnect();
+          } catch (e) {}
+        }
+
+        gameState.source = audioContext.createMediaElementSource(audioElement);
+        beatDetector = new BeatDetector(audioContext);
+        beatDetector.connect(gameState.source);
+
+        audioElement.currentTime = 0;
+        audioElement.playbackRate = gameState.speed;
+        audioElement.play();
+
+        gameState.isPlaying = true;
+        gameState.isPaused = false;
+        playBtn.disabled = true;
+        pauseBtn.disabled = false;
+
+        startGameLoop();
+      }
+    });
+
+    // Pause Button
+    pauseBtn.addEventListener('click', () => {
+      if (gameState.isPlaying && !gameState.isPaused) {
+        gameState.isPaused = true;
+        audioElement.pause();
+        playBtn.disabled = false;
+        pauseBtn.disabled = true;
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+      }
+    });
+
+    // Restart Button
+    restartBtn.addEventListener('click', () => {
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.currentTime = 0;
+      }
+      resetGame();
+      playBtn.disabled = false;
+      pauseBtn.disabled = true;
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+      draw();
+    });
+
+    // Speed Slider
+    speedSlider.addEventListener('input', (e) => {
+      gameState.speed = parseFloat(e.target.value);
+      speedValue.textContent = `${gameState.speed.toFixed(1)}x`;
+      if (audioElement) {
+        audioElement.playbackRate = gameState.speed;
+      }
+    });
+
+    // Reset Game
+    function resetGame() {
+      gameState.notes = [];
+      gameState.score = 0;
+      gameState.combo = 0;
+      gameState.bestStreak = 0;
+      gameState.totalNotes = 0;
+      gameState.hitNotes = 0;
+      gameState.isPlaying = false;
+      gameState.isPaused = false;
+      gameState.multiplier = 1;
+      gameState.keyFlash = [0, 0, 0, 0, 0];
+      updateDisplay();
+    }
+
+    // Keyboard Input
+    document.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      const laneIndex = CONFIG.keys.indexOf(key);
+
+      if (laneIndex !== -1 && !gameState.keysPressed.has(key)) {
+        gameState.keysPressed.add(key);
+        gameState.keyFlash[laneIndex] = 1;
+        checkHit(laneIndex);
+      }
+
+      // Spacebar to pause/play
+      if (e.code === 'Space' && gameState.isPlaying) {
+        e.preventDefault();
+        if (gameState.isPaused) {
+          playBtn.click();
+        } else {
+          pauseBtn.click();
+        }
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      const key = e.key.toLowerCase();
+      gameState.keysPressed.delete(key);
+    });
+
+    // Check Hit
+    function checkHit(laneIndex) {
+      if (!gameState.isPlaying || gameState.isPaused) return;
+
+      const hitZone = CONFIG.hitZoneY;
+      let closestNote = null;
+      let closestDist = Infinity;
+
+      for (const note of gameState.notes) {
+        if (note.lane === laneIndex && !note.hit && !note.missed) {
+          const dist = Math.abs(note.y - hitZone);
+          if (dist < closestDist && dist < CONFIG.hitTolerance) {
+            closestDist = dist;
+            closestNote = note;
+          }
+        }
+      }
+
+      if (closestNote) {
+        closestNote.hit = true;
+        gameState.hitNotes++;
+        gameState.combo++;
+
+        // Update best streak
+        if (gameState.combo > gameState.bestStreak) {
+          gameState.bestStreak = gameState.combo;
+        }
+
+        // Calculate multiplier based on combo
+        gameState.multiplier = Math.min(4, 1 + Math.floor(gameState.combo / 10));
+
+        // Score based on accuracy
+        let points = 100;
+        let rating = 'Good';
+
+        if (closestDist < CONFIG.perfectTolerance) {
+          points = 150;
+          rating = 'Perfect!';
+        } else if (closestDist < CONFIG.hitTolerance * 0.5) {
+          points = 125;
+          rating = 'Great!';
+        }
+
+        gameState.score += points * gameState.multiplier;
+
+        // Create hit effect
+        createHitEffect(closestNote.lane, rating);
+
+        updateDisplay();
+      }
+    }
+
+    // Create Hit Effect
+    function createHitEffect(lane, rating) {
+      const popup = document.createElement('div');
+      popup.className = 'combo-popup';
+      popup.textContent = rating;
+      popup.style.left = `${canvas.offsetLeft + lane * CONFIG.laneWidth + CONFIG.laneWidth / 2}px`;
+      popup.style.top = `${canvas.offsetTop + CONFIG.hitZoneY - 50}px`;
+      popup.style.color = CONFIG.colors[lane];
+      document.body.appendChild(popup);
+
+      setTimeout(() => popup.remove(), 500);
+    }
+
+    // Generate Notes from Beat Detection
+    function generateNotes() {
+      if (!beatDetector || !gameState.isPlaying || gameState.isPaused) return;
+
+      const beat = beatDetector.detectBeat();
+      const diffSettings = CONFIG.difficulty[difficultySelect.value];
+
+      if (beat.isBeat && Math.random() < diffSettings.noteFrequency) {
+        // Determine number of notes based on intensity and difficulty
+        let numNotes = 1;
+        if (beat.intensity > 1.5 && Math.random() < 0.3) numNotes = 2;
+        if (beat.intensity > 2.0 && Math.random() < 0.2) numNotes = Math.min(3, diffSettings.maxSimultaneous);
+
+        numNotes = Math.min(numNotes, diffSettings.maxSimultaneous);
+
+        // Choose lanes based on frequency characteristics
+        const availableLanes = [0, 1, 2, 3, 4];
+        const chosenLanes = new Set();
+
+        // Bias lane selection based on frequencies
+        const bassWeight = beat.bass / 100;
+        const midWeight = beat.mid / 100;
+        const highWeight = beat.high / 100;
+
+        for (let i = 0; i < numNotes; i++) {
+          let lane;
+          const rand = Math.random();
+
+          if (rand < bassWeight * 0.5) {
+            // Low notes for bass
+            lane = Math.random() < 0.5 ? 0 : 1;
+          } else if (rand < bassWeight * 0.5 + midWeight * 0.3) {
+            // Middle notes for mid frequencies
+            lane = 2;
+          } else {
+            // High notes for treble
+            lane = Math.random() < 0.5 ? 3 : 4;
+          }
+
+          // Avoid duplicates
+          while (chosenLanes.has(lane)) {
+            lane = Math.floor(Math.random() * 5);
+          }
+          chosenLanes.add(lane);
+
+          // Create note
+          gameState.notes.push({
+            lane: lane,
+            y: -CONFIG.noteHeight,
+            hit: false,
+            missed: false,
+            speed: CONFIG.noteSpeed * gameState.speed
+          });
+
+          gameState.totalNotes++;
+        }
+      }
+    }
+
+    // Update Notes
+    function updateNotes() {
+      for (const note of gameState.notes) {
+        if (!note.hit && !note.missed) {
+          note.y += note.speed;
+
+          // Check if note passed hit zone
+          if (note.y > CONFIG.hitZoneY + CONFIG.hitTolerance) {
+            note.missed = true;
+            gameState.combo = 0;
+            gameState.multiplier = 1;
+            updateDisplay();
+          }
+        }
+      }
+
+      // Remove off-screen notes
+      gameState.notes = gameState.notes.filter(note => note.y < canvas.height + 50);
+    }
+
+    // Draw Game
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw background gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bgGrad.addColorStop(0, '#0a0a15');
+      bgGrad.addColorStop(1, '#1a1a2e');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw lanes
+      for (let i = 0; i < CONFIG.lanes; i++) {
+        const x = i * CONFIG.laneWidth;
+
+        // Lane background
+        ctx.fillStyle = `rgba(${hexToRgb(CONFIG.colors[i])}, 0.1)`;
+        ctx.fillRect(x, 0, CONFIG.laneWidth, canvas.height);
+
+        // Lane dividers
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+
+        // Key flash effect
+        if (gameState.keyFlash[i] > 0) {
+          ctx.fillStyle = `rgba(${hexToRgb(CONFIG.colors[i])}, ${gameState.keyFlash[i] * 0.3})`;
+          ctx.fillRect(x, 0, CONFIG.laneWidth, canvas.height);
+          gameState.keyFlash[i] -= 0.1;
+        }
+      }
+
+      // Draw frequency visualization in background
+      if (beatDetector && gameState.isPlaying && !gameState.isPaused) {
+        const freqData = beatDetector.getFrequencyData();
+        ctx.fillStyle = 'rgba(233, 69, 96, 0.1)';
+
+        const barWidth = canvas.width / 64;
+        for (let i = 0; i < 64; i++) {
+          const barHeight = (freqData[i] / 255) * canvas.height * 0.5;
+          ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth - 1, barHeight);
+        }
+      }
+
+      // Draw hit zone
+      const hitZoneGrad = ctx.createLinearGradient(0, CONFIG.hitZoneY - 20, 0, CONFIG.hitZoneY + 30);
+      hitZoneGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+      hitZoneGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+      hitZoneGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = hitZoneGrad;
+      ctx.fillRect(0, CONFIG.hitZoneY - 20, canvas.width, 50);
+
+      // Draw hit zone line
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, CONFIG.hitZoneY);
+      ctx.lineTo(canvas.width, CONFIG.hitZoneY);
+      ctx.stroke();
+
+      // Draw target circles
+      for (let i = 0; i < CONFIG.lanes; i++) {
+        const x = i * CONFIG.laneWidth + CONFIG.laneWidth / 2;
+
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(x, CONFIG.hitZoneY, 35, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${hexToRgb(CONFIG.colors[i])}, ${gameState.keysPressed.has(CONFIG.keys[i]) ? 0.8 : 0.3})`;
+        ctx.lineWidth = gameState.keysPressed.has(CONFIG.keys[i]) ? 4 : 2;
+        ctx.stroke();
+
+        // Inner circle when pressed
+        if (gameState.keysPressed.has(CONFIG.keys[i])) {
+          ctx.beginPath();
+          ctx.arc(x, CONFIG.hitZoneY, 25, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${hexToRgb(CONFIG.colors[i])}, 0.5)`;
+          ctx.fill();
+        }
+      }
+
+      // Draw notes
+      for (const note of gameState.notes) {
+        if (!note.hit && !note.missed) {
+          drawNote(note);
+        } else if (note.hit) {
+          // Hit animation
+          drawHitNote(note);
+        }
+      }
+
+      // Draw key labels at bottom
+      ctx.font = 'bold 24px sans-serif';
+      ctx.textAlign = 'center';
+      for (let i = 0; i < CONFIG.lanes; i++) {
+        const x = i * CONFIG.laneWidth + CONFIG.laneWidth / 2;
+        ctx.fillStyle = gameState.keysPressed.has(CONFIG.keys[i]) ? CONFIG.colors[i] : '#666';
+        ctx.fillText(CONFIG.keys[i].toUpperCase(), x, canvas.height - 20);
+      }
+    }
+
+    // Draw Note
+    function drawNote(note) {
+      const x = note.lane * CONFIG.laneWidth + CONFIG.laneWidth / 2;
+      const color = CONFIG.colors[note.lane];
+
+      // Note glow
+      const gradient = ctx.createRadialGradient(x, note.y, 5, x, note.y, 35);
+      gradient.addColorStop(0, color);
+      gradient.addColorStop(1, 'transparent');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x - 35, note.y - 35, 70, 70);
+
+      // Note body
+      ctx.beginPath();
+      ctx.arc(x, note.y, 25, 0, Math.PI * 2);
+
+      const noteGrad = ctx.createRadialGradient(x - 8, note.y - 8, 0, x, note.y, 25);
+      noteGrad.addColorStop(0, '#fff');
+      noteGrad.addColorStop(0.3, color);
+      noteGrad.addColorStop(1, shadeColor(color, -30));
+
+      ctx.fillStyle = noteGrad;
+      ctx.fill();
+
+      // Note border
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Draw Hit Note (explosion effect)
+    function drawHitNote(note) {
+      // Particle explosion effect would go here
+      // For now, we'll skip drawing hit notes
+    }
+
+    // Update Display
+    function updateDisplay() {
+      scoreDisplay.textContent = gameState.score.toLocaleString();
+      comboDisplay.textContent = gameState.combo;
+      streakDisplay.textContent = gameState.bestStreak;
+
+      const accuracy = gameState.totalNotes > 0
+        ? Math.round((gameState.hitNotes / gameState.totalNotes) * 100)
+        : 100;
+      accuracyDisplay.textContent = `${accuracy}%`;
+
+      // Multiplier display
+      if (gameState.multiplier > 1) {
+        multiplierDisplay.textContent = `${gameState.multiplier}x`;
+        multiplierDisplay.style.color = ['#22c55e', '#eab308', '#f97316', '#ef4444'][gameState.multiplier - 1];
+      } else {
+        multiplierDisplay.textContent = '';
+      }
+    }
+
+    // Helper: Hex to RGB
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+        : '255, 255, 255';
+    }
+
+    // Helper: Shade color
+    function shadeColor(color, percent) {
+      const num = parseInt(color.replace('#', ''), 16);
+      const amt = Math.round(2.55 * percent);
+      const R = (num >> 16) + amt;
+      const G = (num >> 8 & 0x00FF) + amt;
+      const B = (num & 0x0000FF) + amt;
+      return '#' + (0x1000000 +
+        (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+        (B < 255 ? B < 1 ? 0 : B : 255)
+      ).toString(16).slice(1);
+    }
+
+    // Game Loop
+    function startGameLoop() {
+      function gameLoop() {
+        if (!gameState.isPaused && gameState.isPlaying) {
+          generateNotes();
+          updateNotes();
+          draw();
+
+          // Check if song ended
+          if (audioElement && audioElement.ended) {
+            gameState.isPlaying = false;
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            showGameOver();
+            return;
+          }
+
+          animationId = requestAnimationFrame(gameLoop);
+        }
+      }
+
+      animationId = requestAnimationFrame(gameLoop);
+    }
+
+    // Show Game Over
+    function showGameOver() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#e94560';
+      ctx.font = 'bold 48px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('SONG COMPLETE!', canvas.width / 2, canvas.height / 2 - 80);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '24px sans-serif';
+      ctx.fillText(`Final Score: ${gameState.score.toLocaleString()}`, canvas.width / 2, canvas.height / 2 - 20);
+      ctx.fillText(`Best Streak: ${gameState.bestStreak}`, canvas.width / 2, canvas.height / 2 + 20);
+
+      const accuracy = gameState.totalNotes > 0
+        ? Math.round((gameState.hitNotes / gameState.totalNotes) * 100)
+        : 100;
+      ctx.fillText(`Accuracy: ${accuracy}%`, canvas.width / 2, canvas.height / 2 + 60);
+
+      // Grade
+      let grade = 'F';
+      if (accuracy >= 95) grade = 'S';
+      else if (accuracy >= 90) grade = 'A';
+      else if (accuracy >= 80) grade = 'B';
+      else if (accuracy >= 70) grade = 'C';
+      else if (accuracy >= 60) grade = 'D';
+
+      ctx.font = 'bold 72px sans-serif';
+      ctx.fillStyle = grade === 'S' ? '#ffd700' : grade === 'A' ? '#22c55e' : grade === 'B' ? '#3b82f6' : '#fff';
+      ctx.fillText(grade, canvas.width / 2, canvas.height / 2 + 140);
+    }
+
+    // Initial draw
+    draw();
+  </script>
+</body>
+</html>
